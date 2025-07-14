@@ -1,0 +1,7 @@
+[
+  {
+    "directory": "/Users/ivan/dev/ray-bits",
+    "command": "clang -I/opt/homebrew/include -Wall -Wextra -O0 -c main.c",
+    "file": "main.c"
+  }
+]
