@@ -1,1 +1,7 @@
-.zed / compile_comands.json *.o
+.zed/
+.vscode/
+compile_comands.json 
+*.o
+.DS_Store
+bin/
+
