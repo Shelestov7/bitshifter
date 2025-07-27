@@ -1,2 +1,1 @@
-.zed/
-compile_comands.json
+.zed / compile_comands.json *.o
