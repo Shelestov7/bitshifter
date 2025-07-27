@@ -3,13 +3,14 @@
 #include <string.h>
 #include <stdio.h>
 
-const int count = 8;
+#define COUNT 8
+#define TIMER 30
+
 const char *digits[2] = {"0", "1"};
 
+typedef enum GameScreen { LOGO, TITLE, PAUSE, GAMEPLAY, ENDING } GameScreen;
+
 typedef enum {IDLE, SLIDE_OUT_UP, SLIDE_IN_UP, SLIDE_OUT_DOWN, SLIDE_IN_DOWN} SlideState;
-
-typedef enum {PAUSE, IN_PROGRESS} GameState;
-
 
 typedef struct {
     int value;         // 0 or 1
@@ -24,15 +25,18 @@ typedef struct {
 } DigitAnim;
 
 typedef struct {
-    GameState GameState;
     int score;
-    double timer;
-} Game;
+    int *input;
+} Player;
 
+typedef struct {
+    double timer;
+    GameScreen state;
+} Game;
 
 int fromBitsToInt(DigitAnim numbers[]) {
     int result = 0;
-    for (int i = 0, pow = 7; i < 8; i++, pow--) {
+    for (int i = 0, pow = COUNT - 1; i < 8; i++, pow--) {
         if (numbers[i].value == 1) {
             result += 1 << pow;
         }
@@ -41,6 +45,7 @@ int fromBitsToInt(DigitAnim numbers[]) {
 }
 
 int main(void) {
+    // Initialization
     SetTraceLogLevel(LOG_WARNING);
     SetConfigFlags(FLAG_WINDOW_RESIZABLE);
     InitWindow(1280, 720, "Bit Shifter");
@@ -49,14 +54,32 @@ int main(void) {
     float maxFontSize = 140.0f;
     Font fontZeros = LoadFontEx("resources/fonts/JetBrainsMono-Regular.ttf", maxFontSize * 2, NULL, 0);
     SetTextureFilter(fontZeros.texture, TEXTURE_FILTER_BILINEAR);
-    DigitAnim anims[count];
-    for (int i = 0; i < count; i++) {
+    Texture2D texLogo = LoadTexture("resources/img/ogo.png");
+
+
+
+
+    DigitAnim anims[COUNT];
+    for (int i = 0; i < COUNT; i++) {
         anims[i].value = 0;
         anims[i].state = IDLE;
         anims[i].y = 0; //
     }
 
     float slideSpeedBase = 600.0f; 
+    GameScreen screen = LOGO;  // Current game screen state
+    int framesCounter = 0;
+    Game game = {0};  
+    Player player = {0};
+
+    // Initialize game
+    game.timer = 0.0f;
+    game.state = screen; // Game LOGO state toggle
+
+    // Initialize player
+    player.score = 1;
+    player.input = 0;
+
 
     while (!WindowShouldClose()) {
         int screenWidth = GetScreenWidth();
@@ -71,12 +94,12 @@ int main(void) {
         float slideSpeed = slideSpeedBase * (fontSize / 120.0f);
 
         Vector2 digitSize = MeasureTextEx(fontZeros, digits[0], fontSize, spacing);
-        float totalWidth = count * digitSize.x + (count - 1) * spacing;
+        float totalWidth = COUNT * digitSize.x + (COUNT - 1) * spacing;
         float startX = (screenWidth - totalWidth) / 2.0f;
         float centerY = screenHeight / 2.0f;
 
         // update all coordinate
-        for (int i = 0; i < count; i++) {
+        for (int i = 0; i < COUNT; i++) {
             if (anims[i].state == IDLE) anims[i].y = centerY; 
             anims[i].startY = centerY;
             anims[i].outTargetY = centerY - digitSize.y - spacing;
@@ -89,7 +112,7 @@ int main(void) {
         int value = fromBitsToInt(anims);
 
         // Update bit by keybord
-        for (int i = 0; i < count; i++) {
+        for (int i = 0; i < COUNT; i++) {
             if (IsKeyPressed(KEY_ONE + i) && anims[i].state == IDLE) {
                 if (anims[i].value == 0) {
                     anims[i].state = SLIDE_OUT_UP;
@@ -99,7 +122,7 @@ int main(void) {
             }
         }
 
-        for (int i = 0; i < count; i++) {
+        for (int i = 0; i < COUNT; i++) {
             switch(anims[i].state) {
                 case SLIDE_OUT_UP:
                     anims[i].y -= slideSpeed * GetFrameTime();
@@ -146,10 +169,10 @@ int main(void) {
         // Blue Frame
         DrawRectangleLinesEx((Rectangle){margin, margin, screenWidth - 2 * margin, screenHeight - 2 * margin}, 4, BLUE);
 
-        DrawTextEx(fontZeros, TextFormat("Score: %08i", score), (Vector2){30, 30}, 4.5f, 80, RED);
+        DrawTextEx(fontZeros, TextFormat("Score: %03i", score), (Vector2){screenWidth - 15 * margin, 50}, fontSize / 4.5f, spacing / 2.0f, RED);
 
         // Draw Bits
-        for (int i = 0; i < count; i++) {
+        for (int i = 0; i < COUNT; i++) {
             float x = startX + i * (digitSize.x + spacing);
             DrawTextEx(fontZeros, digits[anims[i].value], (Vector2){x, anims[i].y}, fontSize, spacing, BLACK);
             char keyHint[4];
