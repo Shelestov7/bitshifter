@@ -7,6 +7,7 @@
 #define LIFETIME 30
 #define GAMENAME "B1TShifter"
 #define PAUSE_WORD "PAUSED"
+#define REWARD_FOR_RIGHT_GUESS 10
 
 const char *digits[2] = {"0", "1"};
 
@@ -41,6 +42,10 @@ bool TimerDone(Timer* timer)
     return false;
 }
 
+void AddTimeToTimer(Timer* timer) {
+    timer->Lifetime += REWARD_FOR_RIGHT_GUESS;
+}
+
 // Structure representing each animated bit 
 typedef struct {
     int value;  // Current value: 0 or 1
@@ -65,6 +70,14 @@ typedef struct {
     GameScreen state;  
     bool gamePaused;   
 } Game;
+
+// Check that all bit in IDLE state
+bool AllIdle(DigitAnim digits[]) {
+    for (int i = 0; i < COUNT; i++) {
+        if (digits[i].state != IDLE) return false;
+    }
+    return true;
+}
 
 // Convert bit array to int value
 int fromBitsToInt(DigitAnim numbers[]) {
@@ -104,6 +117,7 @@ int main(void) {
     Player player = {0};
 
     Timer timer = { 0 };
+    Timer *timer_ptr = &timer;
     game.state = LOGO;
     player.score = 0;
 
@@ -172,8 +186,9 @@ int main(void) {
             }
         }
 
-        if (!game.gamePaused && !guessedCorrectly && value == targetNumber) {
+        if (!game.gamePaused && !guessedCorrectly && value == targetNumber && AllIdle(anims)) {
             player.score += 10;
+            AddTimeToTimer(timer_ptr);
             guessedCorrectly = true;
             StartTimer(&cooldown, 1.0f); // wait 1 second before new target
         }
