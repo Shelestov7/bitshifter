@@ -71,6 +71,14 @@ typedef struct {
     bool gamePaused;   
 } Game;
 
+// Check that all bit in IDLE state
+bool AllIdle(DigitAnim digits[]) {
+    for (int i = 0; i < COUNT; i++) {
+        if (digits[i].state != IDLE) return false;
+    }
+    return true;
+}
+
 // Convert bit array to int value
 int fromBitsToInt(DigitAnim numbers[]) {
     int result = 0;
@@ -178,7 +186,7 @@ int main(void) {
             }
         }
 
-        if (!game.gamePaused && !guessedCorrectly && value == targetNumber) {
+        if (!game.gamePaused && !guessedCorrectly && value == targetNumber && AllIdle(anims)) {
             player.score += 10;
             AddTimeToTimer(timer_ptr);
             guessedCorrectly = true;
