@@ -7,7 +7,6 @@ BitShifter is a small bit-manipulation game written in C using [Raylib](https://
 
 This is my very first C project!  
 I made it to learn C programming, basic game loops, and how to use the Raylib graphics library.
-![Uploading image.png…]()
 
 ---
 
