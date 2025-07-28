@@ -7,6 +7,7 @@
 #define LIFETIME 30
 #define GAMENAME "B1TShifter"
 #define PAUSE_WORD "PAUSED"
+#define REWARD_FOR_RIGHT_GUESS 10
 
 const char *digits[2] = {"0", "1"};
 
@@ -39,6 +40,10 @@ bool TimerDone(Timer* timer)
     if (timer != NULL)
         return timer->Lifetime <= 0;
     return false;
+}
+
+void AddTimeToTimer(Timer* timer) {
+    timer->Lifetime += REWARD_FOR_RIGHT_GUESS;
 }
 
 // Structure representing each animated bit 
@@ -104,6 +109,7 @@ int main(void) {
     Player player = {0};
 
     Timer timer = { 0 };
+    Timer *timer_ptr = &timer;
     game.state = LOGO;
     player.score = 0;
 
@@ -174,6 +180,7 @@ int main(void) {
 
         if (!game.gamePaused && !guessedCorrectly && value == targetNumber) {
             player.score += 10;
+            AddTimeToTimer(timer_ptr);
             guessedCorrectly = true;
             StartTimer(&cooldown, 1.0f); // wait 1 second before new target
         }
