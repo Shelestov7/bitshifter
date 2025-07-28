@@ -10,7 +10,7 @@ I made it to learn C programming, basic game loops, and how to use the Raylib gr
 ## How to Play
 
 - Use the number keys `1-8` to flip each bit.
-- The goal is to match a target value within the time limit (30 seconds).
+- The goal is to match a target value within the time limit (30 seconds) you gain a reward of 10 seconds if guess right.
 - Press `P` to pause/unpause the game.
 
 ---
