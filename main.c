@@ -12,10 +12,9 @@ const char *digits[2] = {"0", "1"};
 
 // Screen states
 typedef enum GameScreen { LOGO, TITLE, GAMEPLAY, PAUSE, ENDING } GameScreen;
-// Animation states for digit transitions
+// Animation states
 typedef enum {IDLE, SLIDE_OUT_UP, SLIDE_IN_UP, SLIDE_OUT_DOWN, SLIDE_IN_DOWN} SlideState;
 
-// define a timer
 typedef struct {
     float Lifetime;
 } Timer;
@@ -57,14 +56,14 @@ typedef struct {
 
 // Player stats
 typedef struct {
-    int score; // Player score
+    int score; 
 } Player;
 
 // Main game state struct
 typedef struct {
-    Timer timer;       // Countdown timer (seconds)
-    GameScreen state;   // Current game screen
-    bool gamePaused;    // Pause flag
+    Timer timer;       // Countdown timer 
+    GameScreen state;  
+    bool gamePaused;   
 } Game;
 
 // Convert bit array to int value
@@ -326,7 +325,7 @@ int main(void) {
                 const char *hint = "Press 1-8 to flip bit";
                 DrawTextEx(fontZeros, hint, (Vector2){30, 30}, fontSize / 4.5f, spacing / 2.0f, GRAY);
 
-                // Draw timer in top right corner
+                // Draw timer in the top right corner
                 int secondsLeft = (int)(timer.Lifetime > 0 ? timer.Lifetime : 0);
                 char timerText[8];
                 snprintf(timerText, sizeof(timerText), "%02d:%02d", secondsLeft / 60, secondsLeft % 60);
