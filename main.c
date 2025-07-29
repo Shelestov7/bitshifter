@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
+#include <time.h>
 
 #define COUNT 8
 #define LIFETIME 30
@@ -16,33 +17,28 @@ typedef enum GameScreen { LOGO, TITLE, GAMEPLAY, PAUSE, ENDING } GameScreen;
 // Animation states
 typedef enum {IDLE, SLIDE_OUT_UP, SLIDE_IN_UP, SLIDE_OUT_DOWN, SLIDE_IN_DOWN} SlideState;
 
-typedef struct {
-    float Lifetime;
-} Timer;
+typedef struct { float Lifetime;} Timer_t;
 
 // start a timer with a specific lifetime
-void StartTimer(Timer* timer, float lifetime)
-{
+void StartTimer(Timer_t* timer, float lifetime) {
     if (timer != NULL)
         timer->Lifetime = lifetime;
 }
 
 // update a timer with the current frame time
-void UpdateTimer(Timer* timer)
-{
+void UpdateTimer(Timer_t* timer) {
     if (timer != NULL && timer->Lifetime > 0)
         timer->Lifetime -= GetFrameTime();
 }
 
 // check if a timer is done.
-bool TimerDone(Timer* timer)
-{
+bool TimerDone(Timer_t* timer) {
     if (timer != NULL)
         return timer->Lifetime <= 0;
     return false;
 }
 
-void AddTimeToTimer(Timer* timer) {
+void AddTimeToTimer(Timer_t* timer) {
     timer->Lifetime += REWARD_FOR_RIGHT_GUESS;
 }
 
@@ -66,7 +62,7 @@ typedef struct {
 
 // Main game state struct
 typedef struct {
-    Timer timer;       // Countdown timer 
+    Timer_t timer;       // Countdown timer 
     GameScreen state;  
     bool gamePaused;   
 } Game;
@@ -116,16 +112,17 @@ int main(void) {
     Game game = {0};
     Player player = {0};
 
-    Timer timer = { 0 };
-    Timer *timer_ptr = &timer;
+    Timer_t timer = { 0 };
+    Timer_t *timer_ptr = &timer;
     game.state = LOGO;
     player.score = 0;
 
     bool timerStarted = false; // Flag to track timer initialization
 
-    int targetNumber = rand() % 256;
+    srand(time(NULL));
+    int targetNumber = rand() % (1<<8);
     bool guessedCorrectly = false;
-    Timer cooldown = { 0 };
+    Timer_t cooldown = { 0 };
 
     // Main game loop
     while (!WindowShouldClose()) {
